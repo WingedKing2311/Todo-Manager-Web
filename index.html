@@ -1,17 +1,37 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Task Manager</title>
+    <meta charset="UTF-8">
+    <title>Task Manager Web App</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h2>Task Manager</h2>
+<div class="container">
+    <h1>Task Manager</h1>
+    <p class="subtitle">Organize and track your tasks efficiently</p>
 
-<input id="taskInput" placeholder="Enter task">
-<button onclick="addTask()">Add</button>
+    <!-- Input Section -->
+    <input id="taskInput" placeholder="Enter a new task...">
 
-<ul id="taskList"></ul>
+    <select id="priority">
+        <option value="Low">Low Priority</option>
+        <option value="Medium">Medium Priority</option>
+        <option value="High">High Priority</option>
+    </select>
+
+    <button onclick="addTask()">Add Task</button>
+
+    <!-- Filter Section -->
+    <div class="filters">
+        <button onclick="filterTasks('all')">All</button>
+        <button onclick="filterTasks('completed')">Completed</button>
+        <button onclick="filterTasks('pending')">Pending</button>
+    </div>
+
+    <!-- Task List -->
+    <ul id="taskList"></ul>
+</div>
 
 <script src="script.js"></script>
 </body>
