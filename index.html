@@ -20,9 +20,14 @@
         <option value="High">High Priority</option>
     </select>
 
+    <input type="date" id="dueDate">
+
     <button onclick="addTask()">Add Task</button>
 
-    <!-- Filter Section -->
+    <!-- Sort -->
+    <button onclick="sortByDate()">Sort by Due Date</button>
+
+    <!-- Filters -->
     <div class="filters">
         <button onclick="filterTasks('all')">All</button>
         <button onclick="filterTasks('completed')">Completed</button>

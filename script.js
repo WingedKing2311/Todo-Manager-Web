@@ -5,20 +5,26 @@ let currentFilter = "all";
 function addTask() {
     const input = document.getElementById("taskInput");
     const priority = document.getElementById("priority").value;
+    const dueDate = document.getElementById("dueDate").value;
 
-    if (input.value.trim() === "") return;
+    const text = input.value.trim();
+    if (!text) return;
 
     const task = {
-        text: input.value.trim(),
+        text,
         completed: false,
-        priority: priority
+        priority: priority || "Low",
+        dueDate: dueDate || ""
     };
 
     tasks.push(task);
+
+    sortByDate(); // auto sort (nice UX)
     saveTasks();
     renderTasks();
 
     input.value = "";
+    document.getElementById("dueDate").value = "";
 }
 
 // Render Tasks
@@ -40,26 +46,47 @@ function renderTasks() {
 
         const li = document.createElement("li");
 
-        // Safe priority class
         if (task.priority) {
             li.classList.add(task.priority.toLowerCase());
         }
 
-        li.innerHTML = `
-            <span class="${task.completed ? 'completed' : ''}">
-                ${task.text} (${task.priority || "Low"})
-            </span>
-            <button onclick="deleteTask(${index})">Delete</button>
-        `;
+        const textSpan = document.createElement("span");
+        textSpan.className = task.completed ? "completed" : "";
+        textSpan.innerText = `${task.text} (${task.priority})`;
 
-        // Toggle complete
-        li.querySelector("span").onclick = () => toggleTask(index);
+        textSpan.onclick = () => toggleTask(index);
+
+        const due = document.createElement("small");
+        due.innerText = `Due: ${task.dueDate || "No date"}`;
+
+        const leftDiv = document.createElement("div");
+        leftDiv.appendChild(textSpan);
+        leftDiv.appendChild(document.createElement("br"));
+        leftDiv.appendChild(due);
+
+        const rightDiv = document.createElement("div");
+
+        const editBtn = document.createElement("button");
+        editBtn.innerText = "Edit";
+        editBtn.onclick = () => editTask(index);
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.innerText = "Delete";
+        deleteBtn.onclick = () => deleteTask(index);
+
+        rightDiv.appendChild(editBtn);
+        rightDiv.appendChild(deleteBtn);
+
+        li.appendChild(leftDiv);
+        li.appendChild(rightDiv);
 
         list.appendChild(li);
     });
 
     if (!rendered) {
-        list.innerHTML = "<p>No matching tasks</p>";
+        list.innerHTML = currentFilter === "all"
+            ? "<p>No tasks yet</p>"
+            : "<p>No matching tasks</p>";
     }
 }
 
@@ -77,24 +104,51 @@ function toggleTask(index) {
     renderTasks();
 }
 
+// Edit Task
+function editTask(index) {
+    const newText = prompt("Edit task:", tasks[index].text);
+    if (!newText || !newText.trim()) return;
+
+    const newDate = prompt(
+        "Edit due date (YYYY-MM-DD):",
+        tasks[index].dueDate || ""
+    );
+
+    tasks[index].text = newText.trim();
+    tasks[index].dueDate = newDate || "";
+
+    saveTasks();
+    renderTasks();
+}
+
+// Sort Tasks by Due Date
+function sortByDate() {
+    tasks.sort((a, b) => {
+        if (!a.dueDate) return 1;
+        if (!b.dueDate) return -1;
+        return new Date(a.dueDate) - new Date(b.dueDate);
+    });
+}
+
 // Filter Tasks
 function filterTasks(type) {
     currentFilter = type;
     renderTasks();
 }
 
-// Save to localStorage
+// Save
 function saveTasks() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
-// Load from localStorage
+// Load
 function loadTasks() {
     const data = localStorage.getItem("tasks");
 
     if (data) {
         tasks = JSON.parse(data).map(task => ({
-            priority: "Low", // fallback for old data
+            priority: "Low",
+            dueDate: "",
             ...task
         }));
     }
@@ -104,9 +158,9 @@ function loadTasks() {
 
 // Enter key support
 document.getElementById("taskInput")
-.addEventListener("keypress", function(e) {
+.addEventListener("keypress", (e) => {
     if (e.key === "Enter") addTask();
 });
 
-// Load on startup
+// Init
 loadTasks();
