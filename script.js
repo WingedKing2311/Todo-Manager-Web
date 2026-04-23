@@ -1,16 +1,17 @@
 let tasks = [];
-
 let currentFilter = "all";
 
 // Add Task
 function addTask() {
     const input = document.getElementById("taskInput");
+    const priority = document.getElementById("priority").value;
 
     if (input.value.trim() === "") return;
 
     const task = {
         text: input.value,
-        completed: false
+        completed: false,
+        priority: priority
     };
 
     tasks.push(task);
@@ -25,7 +26,19 @@ function renderTasks() {
     const list = document.getElementById("taskList");
     list.innerHTML = "";
 
+    if (tasks.length === 0) {
+        list.innerHTML = "<p>No tasks yet</p>";
+        return;
+    }
+
     tasks.forEach((task, index) => {
+
+        // Filtering
+        if (
+            (currentFilter === "completed" && !task.completed) ||
+            (currentFilter === "pending" && task.completed)
+        ) return;
+
         const li = document.createElement("li");
         li.classList.add(task.priority.toLowerCase());
 
@@ -34,7 +47,12 @@ function renderTasks() {
                 ${task.text} (${task.priority})
             </span>
             <button onclick="deleteTask(${index})">Delete</button>
-        `;  
+        `;
+
+        // Toggle complete
+        li.querySelector("span").onclick = () => toggleTask(index);
+
+        list.appendChild(li);
     });
 }
 
@@ -52,6 +70,12 @@ function toggleTask(index) {
     renderTasks();
 }
 
+// Filter Tasks
+function filterTasks(type) {
+    currentFilter = type;
+    renderTasks();
+}
+
 // Save to localStorage
 function saveTasks() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
@@ -63,22 +87,16 @@ function loadTasks() {
 
     if (data) {
         tasks = JSON.parse(data);
-        renderTasks();
     }
-}
 
-const priority = document.getElementById("priority").value;
-
-const task = {
-    text: input.value,
-    completed: false,
-    priority: priority
-};
-
-function filterTasks(type) {
-    currentFilter = type;
     renderTasks();
 }
+
+// Enter key support
+document.getElementById("taskInput")
+.addEventListener("keypress", function(e) {
+    if (e.key === "Enter") addTask();
+});
 
 // Load on startup
 loadTasks();
