@@ -9,7 +9,7 @@ function addTask() {
     if (input.value.trim() === "") return;
 
     const task = {
-        text: input.value,
+        text: input.value.trim(),
         completed: false,
         priority: priority
     };
@@ -26,10 +26,7 @@ function renderTasks() {
     const list = document.getElementById("taskList");
     list.innerHTML = "";
 
-    if (tasks.length === 0) {
-        list.innerHTML = "<p>No tasks yet</p>";
-        return;
-    }
+    let rendered = false;
 
     tasks.forEach((task, index) => {
 
@@ -39,12 +36,18 @@ function renderTasks() {
             (currentFilter === "pending" && task.completed)
         ) return;
 
+        rendered = true;
+
         const li = document.createElement("li");
-        li.classList.add(task.priority.toLowerCase());
+
+        // Safe priority class
+        if (task.priority) {
+            li.classList.add(task.priority.toLowerCase());
+        }
 
         li.innerHTML = `
             <span class="${task.completed ? 'completed' : ''}">
-                ${task.text} (${task.priority})
+                ${task.text} (${task.priority || "Low"})
             </span>
             <button onclick="deleteTask(${index})">Delete</button>
         `;
@@ -54,6 +57,10 @@ function renderTasks() {
 
         list.appendChild(li);
     });
+
+    if (!rendered) {
+        list.innerHTML = "<p>No matching tasks</p>";
+    }
 }
 
 // Delete Task
@@ -86,7 +93,10 @@ function loadTasks() {
     const data = localStorage.getItem("tasks");
 
     if (data) {
-        tasks = JSON.parse(data);
+        tasks = JSON.parse(data).map(task => ({
+            priority: "Low", // fallback for old data
+            ...task
+        }));
     }
 
     renderTasks();
