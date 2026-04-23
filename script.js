@@ -1,5 +1,7 @@
 let tasks = [];
 
+let currentFilter = "all";
+
 // Add Task
 function addTask() {
     const input = document.getElementById("taskInput");
@@ -25,17 +27,14 @@ function renderTasks() {
 
     tasks.forEach((task, index) => {
         const li = document.createElement("li");
+        li.classList.add(task.priority.toLowerCase());
 
         li.innerHTML = `
-            <span style="cursor:pointer; ${task.completed ? 'text-decoration: line-through;' : ''}">
-                ${task.text}
+            <span class="${task.completed ? 'completed' : ''}">
+                ${task.text} (${task.priority})
             </span>
             <button onclick="deleteTask(${index})">Delete</button>
-        `;
-
-        li.querySelector("span").onclick = () => toggleTask(index);
-
-        list.appendChild(li);
+        `;  
     });
 }
 
@@ -66,6 +65,19 @@ function loadTasks() {
         tasks = JSON.parse(data);
         renderTasks();
     }
+}
+
+const priority = document.getElementById("priority").value;
+
+const task = {
+    text: input.value,
+    completed: false,
+    priority: priority
+};
+
+function filterTasks(type) {
+    currentFilter = type;
+    renderTasks();
 }
 
 // Load on startup
