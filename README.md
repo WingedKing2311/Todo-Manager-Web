@@ -52,3 +52,5 @@ A clean and interactive task management web application built using **HTML, CSS,
 1. Clone the repository  
 ```bash
 git clone https://github.com/WingedKing2311/Todo-Manager-Web.git
+```
+2. Open index.html in your browser
