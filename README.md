@@ -40,9 +40,9 @@ A clean and interactive task management web application built using **HTML, CSS,
 ---
 
 ## 📂 Project Structure
-├── index.html
-├── style.css
-├── script.js
+- index.html
+- style.css
+- script.js
 
 
 ---
